@@ -21,6 +21,7 @@ const routes: Routes = [
     IonicModule,
     RouterModule.forChild(routes)
   ],
-  declarations: [LandingPage]
+  declarations: [LandingPage, LoginPage, RegisterPage],
+  entryComponents: [LoginPage, RegisterPage]
 })
 export class LandingPageModule {}

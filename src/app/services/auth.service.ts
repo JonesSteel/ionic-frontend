@@ -39,12 +39,53 @@ export class AuthService {
 
   register(fName: String, lName: String, email: String, password: String) {
     return this.http.post(this.env.API_URL + 'auth/register',
-        {fName: fName, lName:  lName, email: email, password: password});
+        {fName: fName, lName:  lName, email: email, password: password})
   }
 
   logout() {
     const headers = new HttpHeaders({
-        'Authorization': this.token['token_type'] + ' ' + this.token['access_token']
+        'Authorization': this.token["token_type"] + " " + this.token["access_token"]
     });
+
+    return this.http.get(this.env.API_URL + 'auth/logout', { headers: headers })
+    .pipe(
+      tap(data => {
+        this.storage.remove("token");
+        this.isLoggedIn = false;
+        delete this.token;
+        return data;
+      })
+    )
+  }
+
+  user() {
+    const headers = new HttpHeaders({
+      'Authorization': this.token["token_type"] + " " + this.token["access_token"]
+    });
+
+    return this.http.get<User>(this.env.API_URL + 'auth/User', { headers: headers })
+    .pipe(
+      tap(user => {
+        return user;
+      })
+    )
+  }
+
+  getToken() {
+    return this.storage.getItem('token').then(
+      data => {
+        this.token = data;
+
+        if(this.token != null) {
+          this.isLoggedIn = true;
+        } else {
+          this.isLoggedIn = false;
+        }
+      },
+      error => {
+        this.token = null;
+        this.isLoggedIn = false;
+      }
+    );
   }
 }
